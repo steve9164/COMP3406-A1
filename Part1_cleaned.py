@@ -63,10 +63,16 @@ def generate_eigenimages(imgs, n_eig, plot):
         picture = image_data(imgs['data'][i])
         images[label].append(picture)
     
-    
+    # Validation matrix
+    validation = []
+    eigenimages = []
     # extract eigen images for each category
     print('Starting svd')
-    eigenimages = np.asarray([w[0:n_eig, :] for _, s, w in map(np.linalg.svd, images)])
+    for image in images:
+        U, s, V  = np.linalg.svd(image, full_matrices=False)
+        b = U[:n_eig,:].dot(s)
+        validation.append(b)
+        eigenimages.append(V[:n_eig,:])
     print('Finished svd')
 
 
@@ -78,7 +84,7 @@ def generate_eigenimages(imgs, n_eig, plot):
                 plt.imshow(eigenimages[c][i].reshape(32,32), cmap='Greys_r')
                 plt.title('Eigenimages of class' + str(c))
 
-    return eigenimages
+    return eigenimages, validation
 
 def eigen_reconstruct(img, n_rec, components):
     # img: the image to be reconstructed
@@ -86,9 +92,10 @@ def eigen_reconstruct(img, n_rec, components):
     # components: the eigenimages that can be used in the reconstruction
     # display (boolean): prints out the contribution of each eigenimage
 
-    img_components = img.dot(components[:n_rec, :].T)
-    rec_image = img_components.dot(components[:n_rec, :])
-    return rec_image
+    weighting = img.dot(components[:n_rec, :].T)
+    # rec_image = img_components.dot(components[:n_rec, :])
+    # return rec_image
+    return weighting
 
 def comparison(img1, img2):
     return np.sqrt(sum(np.square(img1-img2)))
@@ -106,13 +113,15 @@ def plot_reconstructed(pic, title):
 
 classes = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
+n_eig = 100
+
 test_images = unpickle('./cifar-10-batches-py/test_batch')
 training = [unpickle('./cifar-10-batches-py/data_batch_{}'.format(i+1)) for i in range(5)]
 
 training_images = {'data': [img for train in training for img in train['data']], 
                    'labels': [label for train in training for label in train['labels']]}
 
-eigenimages = generate_eigenimages(training_images, 100, False)
+eigenimages, validation = generate_eigenimages(training_images, n_eig, False)
 '''
 fig = plt.figure()
 for i in range(25):
@@ -121,13 +130,19 @@ for i in range(25):
 '''
 correct = 0
 
-tests = len(test_images['data'])
+print('\n'.join('{}'.format(np.sqrt(sum(x*x for x in v))) for v in validation))
+
+tests = 5 #len(test_images['data'])
 
 for i in range(tests):
     label = test_images['labels'][i]
     picture = image_data(test_images['data'][i])
 
-    store_images = [eigen_reconstruct(picture, 50, eigs) for eigs in eigenimages]
+    weightings = [eigen_reconstruct(picture, n_eig, eigs) for eigs in eigenimages]
+    print('\n'.join('{}'.format(np.sqrt(sum(x*x for x in v))) for v in weightings))
+
+    # Reconstruct images
+    reconstructed = [w.dot(e) for w, e in zip(weightings, eigenimages)]
 
     # ---- Plot the images -----
     # fig = plt.figure()
@@ -135,45 +150,49 @@ for i in range(tests):
     # 	ax = fig.add_subplot(2,5, i+1)
     # 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
 
-
-    err = [comparison(img, picture) for img in store_images]
-    #print(classes[label], ', '.join('{}: {:.2f}'.format(classes[t[0]], t[1]) for t in sorted(enumerate(err), key=lambda t: t[1])[:3]))
+    err = [comparison(v, img) for v, img in zip(validation, weightings)]
+    print(classes[label], ', '.join('{}: {:.2f}'.format(classes[t[0]], t[1]) for t in sorted(enumerate(err), key=lambda t: t[1])))
     if np.argmin(err) == label:
         correct += 1
 
 print(correct, tests)
 print('Accuracy: {:.2%}'.format(correct/float(tests)))
 
-# ----- plot all the images ----
-# fig = plt.figure()
-# for i in range(tests):
-# 	ax = fig.add_subplot(4,5, i+1)
-# 	plt.imshow(image_data(test_images['data'][i]).reshape(32,32), cmap='Greys_r')
+# plt.figure()
+# for i in range(10):
+#     ax = fig.add_subplot(2,5,i+1)
+#     plt.imshow(format_display(store_images[i]))
+
+# # ----- plot all the images ----
+# # fig = plt.figure()
+# # for i in range(tests):
+# # 	ax = fig.add_subplot(4,5, i+1)
+# # 	plt.imshow(image_data(test_images['data'][i]).reshape(32,32), cmap='Greys_r')
+
+# # plt.show()
+
+
+
+# #############################
+# # Plot reconstructed images #
+# #############################
+
+# # fig = plt.figure()
+# # for i in range(10):
+# # 	ax = fig.add_subplot(2,5, i+1)
+# # 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
+# # 	print(comparison(store_images[i], picture))
+
+# # #############################
+# # # Plot original image 	    #
+# # #############################
+
+# # fig = plt.figure()
+
+# # plt.imshow(picture.reshape(32,32), cmap = 'Greys_r')
+
 
 # plt.show()
-
-
-
-#############################
-# Plot reconstructed images #
-#############################
-
-# fig = plt.figure()
-# for i in range(10):
-# 	ax = fig.add_subplot(2,5, i+1)
-# 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
-# 	print(comparison(store_images[i], picture))
-
-# #############################
-# # Plot original image 	    #
-# #############################
-
-# fig = plt.figure()
-
-# plt.imshow(picture.reshape(32,32), cmap = 'Greys_r')
-
-
-
 
 
 
