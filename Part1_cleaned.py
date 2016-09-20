@@ -57,8 +57,8 @@ def generate_eigenimages(imgs, n_eig, plot):
 
 	train = len(imgs['data'])
 	for i in range(train):
-		label = test_images['labels'][i]
-		picture = image_data(test_images['data'][i])
+		label = imgs['labels'][i]
+		picture = image_data(imgs['data'][i])
 		images[label].append(picture)
 	
 	
@@ -102,12 +102,12 @@ def plot_reconstructed(pic, title):
 classes = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
 test_images = unpickle('./cifar-10-batches-py/test_batch')
-training = [unpickle('./cifar-10-batches-py/data_batch_{}'.format(i+1) for i in range(5)]
+training = [unpickle('./cifar-10-batches-py/data_batch_{}'.format(i+1)) for i in range(5)]
 
 training_images = {'data': [img for train in training for img in train['data']], 
-				   'labels': [label for train in training for label in train['labels']}
+				   'labels': [label for train in training for label in train['labels']]}
 
-eigenimages = [generate_eigenimages(training_images, 100, False) for i in range(10)]
+eigenimages = generate_eigenimages(training_images, 100, False)
 '''
 fig = plt.figure()
 for i in range(25):
