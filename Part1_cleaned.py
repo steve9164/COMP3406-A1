@@ -26,9 +26,8 @@ def unpickle(file):
 
 def image_data(img):
 	# Make an array of pixels as [r,g,b]
-    # px = [img[i::32*32] for i in range(len(img)/3)]
-    # return np.asarray([ 0.2989*i[0] + 0.5870*i[1] + 0.1140*i[2] for i in px])
-	return img
+    return RGB2GRY(format_display(img))
+	# return img
 
 def format_display(img):
 	# Takes the image - and formats it such that we get an array of pixels, 
@@ -55,14 +54,16 @@ def generate_eigenimages(imgs, n_eig, plot):
 
 	# Generate a list of lists of images (by category and index within category)
 	images = [[] for x in range(10)]
-	for i in range(len(imgs['data'])):
+
+	train = len(imgs['data'])
+	for i in range(train):
 		label = test_images['labels'][i]
 		picture = image_data(test_images['data'][i])
 		images[label].append(picture)
 	
 	
 	# extract eigen images for each category
-	eigenimages = [w[0:n_eig, :] for _, s, w in map(np.linalg.svd, images)]
+	eigenimages = np.asarray([w[0:n_eig, :] for _, s, w in map(np.linalg.svd, images)])
 
 	if plot:
 		for c in range(10):
@@ -101,7 +102,10 @@ def plot_reconstructed(pic, title):
 classes = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
 test_images = unpickle('./cifar-10-batches-py/test_batch')
-training_images = unpickle('./cifar-10-batches-py/data_batch_1')
+training = [unpickle('./cifar-10-batches-py/data_batch_{}'.format(i+1) for i in range(5)]
+
+training_images = {'data': [img for train in training for img in train['data']], 
+				   'labels': [label for train in training for label in train['labels']}
 
 eigenimages = [generate_eigenimages(training_images, 100, False) for i in range(10)]
 '''
