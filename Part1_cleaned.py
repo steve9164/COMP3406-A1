@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import cPickle
 import matplotlib.pyplot as plt
 import numpy as np
@@ -19,20 +21,20 @@ import random
 
 # Code taken from http://www.cs.toronto.edu/~kriz/cifar.html
 def unpickle(file):
-    fo = open(file, 'rb')
-    dict = cPickle.load(fo)
-    fo.close()
-    return dict
+	with open(file, 'rb') as fo:
+		return cPickle.load(fo)
+
+def image_data(img):
+	# Make an array of pixels as [r,g,b]
+    # px = [img[i::32*32] for i in range(len(img)/3)]
+    # return np.asarray([ 0.2989*i[0] + 0.5870*i[1] + 0.1140*i[2] for i in px])
+	return img
 
 def format_display(img):
-
 	# Takes the image - and formats it such that we get an array of pixels, 
 	# with each pixel having RGB values
 	# Retuns the image as a single 1024 list of pixels
-	px = [img[i::32*32] for i in range(len(img)/3)]
-	px = np.asarray(px)
-
-	return px
+	return np.asarray([img[i::32*32] for i in range(len(img)/3)])
 
 def RGB2GRY(img):
 	# Converts a colour image to grayscale
@@ -45,30 +47,32 @@ def RGB2GRY(img):
 	img = np.asarray(img)
 	return img
 
-def find_eigenimages(c, imgs, n_eig, plot):
+def generate_eigenimages(imgs, n_eig, plot):
 	# c: class of images from which to extract the eigenimages
 	# imgs: the entire data set of images
 	# n_eig: number of eigenimages stored
 	# plot (boolean): plots the first couple of eigenimages
 
-	index = np.argwhere(np.asarray(imgs['labels']) == c)
-
-	# list of selected images, where each image is formatted as an array of pixels
-	image_px = [RGB2GRY(format_display(imgs['data'][i[0]])) for i in index]
-
-	# extract eigen imae 
-	_, s, w = np.linalg.svd(image_px)
-
-	top_components = w[0:n_eig, :]
+	# Generate a list of lists of images (by category and index within category)
+	images = [[] for x in range(10)]
+	for i in range(len(imgs['data'])):
+		label = test_images['labels'][i]
+		picture = image_data(test_images['data'][i])
+		images[label].append(picture)
+	
+	
+	# extract eigen images for each category
+	eigenimages = [w[0:n_eig, :] for _, s, w in map(np.linalg.svd, images)]
 
 	if plot:
-		fig = plt.figure()
-		for i in range(25):
-			ax = fig.add_subplot(5,5,i+1)
-			plt.imshow(top_components[i].reshape(32,32), cmap='Greys_r')
-			plt.title('Eigenimages of class' + str(c))
+		for c in range(10):
+			fig = plt.figure()
+			for i in range(25):
+				ax = fig.add_subplot(5,5,i+1)
+				plt.imshow(eigenimages[c][i].reshape(32,32), cmap='Greys_r')
+				plt.title('Eigenimages of class' + str(c))
 
-	return top_components
+	return eigenimages
 
 def eigen_reconstruct(img, n_rec, components):
 	# img: the image to be reconstructed
@@ -99,7 +103,7 @@ classes = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Hors
 test_images = unpickle('./cifar-10-batches-py/test_batch')
 training_images = unpickle('./cifar-10-batches-py/data_batch_1')
 
-eigenimages = [find_eigenimages(i, training_images, 100, False) for i in range(10)]
+eigenimages = [generate_eigenimages(training_images, 100, False) for i in range(10)]
 '''
 fig = plt.figure()
 for i in range(25):
@@ -108,40 +112,36 @@ for i in range(25):
 '''
 correct = 0
 
-tests = 20 #len(test_images['data'])
+tests = len(test_images['data'])
 
 for i in range(tests):
 	label = test_images['labels'][i]
-	picture = RGB2GRY(format_display(test_images['data'][i]))
+	picture = image_data(test_images['data'][i])
 
 	store_images = [eigen_reconstruct(picture, 50, eigs) for eigs in eigenimages]
 
 	# ---- Plot the images -----
-	fig = plt.figure()
-	for i in range(len(store_images)):
-		ax = fig.add_subplot(2,5, i+1)
-		plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
+	# fig = plt.figure()
+	# for i in range(len(store_images)):
+	# 	ax = fig.add_subplot(2,5, i+1)
+	# 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
 
 
 	err = [comparison(img, picture) for img in store_images]
-	print(classes[label], classes[np.argmin(err)], ', '.join('{}: {:.2f}'.format(classes[t[0]], t[1]) for t in sorted(enumerate(err), key=lambda t: t[1])[:3]))
+	print(classes[label], ', '.join('{}: {:.2f}'.format(classes[t[0]], t[1]) for t in sorted(enumerate(err), key=lambda t: t[1])[:3]))
 	if np.argmin(err) == label:
 		correct += 1
 
 print(correct, tests)
 print('Accuracy: {:.2%}'.format(correct/float(tests)))
-# ----- plot all the images ----
-fig = plt.figure()
-for i in range(tests):
-	ax = fig.add_subplot(4,5, i+1)
-	plt.imshow(RGB2GRY(format_display(test_images['data'][i])).reshape(32,32), cmap='Greys_r')
 
-'''
-	# 1st picture in class c
-	c = 9
-	index = images['labels'].index(c)
-	picture = RGB2GRY(format_display(images['data'][index]))
-	store_images.append(eigen_reconstruct(picture, 25, eigenimages))
+# ----- plot all the images ----
+# fig = plt.figure()
+# for i in range(tests):
+# 	ax = fig.add_subplot(4,5, i+1)
+# 	plt.imshow(image_data(test_images['data'][i]).reshape(32,32), cmap='Greys_r')
+
+# plt.show()
 
 
 
@@ -162,9 +162,7 @@ for i in range(tests):
 # fig = plt.figure()
 
 # plt.imshow(picture.reshape(32,32), cmap = 'Greys_r')
-'''
 
-plt.show()
 
 
 
