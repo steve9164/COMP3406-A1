@@ -21,79 +21,84 @@ import random
 
 # Code taken from http://www.cs.toronto.edu/~kriz/cifar.html
 def unpickle(file):
-	with open(file, 'rb') as fo:
-		return cPickle.load(fo)
+    with open(file, 'rb') as fo:
+        return cPickle.load(fo)
 
 def image_data(img):
-	# Make an array of pixels as [r,g,b]
-    return RGB2GRY(format_display(img))
-	# return img
+
+    # Make an array of pixels as [r,g,b]
+    #img = RGB2GRY(format_display(img))
+    #px = 
+    return (img - img.min())/float(img.max()-img.min())
 
 def format_display(img):
-	# Takes the image - and formats it such that we get an array of pixels, 
-	# with each pixel having RGB values
-	# Retuns the image as a single 1024 list of pixels
-	return np.asarray([img[i::32*32] for i in range(len(img)/3)])
+    # Takes the image - and formats it such that we get an array of pixels, 
+    # with each pixel having RGB values
+    # Retuns the image as a single 1024 list of pixels
+    return np.asarray([img[i::32*32] for i in range(len(img)/3)])
 
 def RGB2GRY(img):
-	# Converts a colour image to grayscale
-	# Image needs to be in the format as returned by format_display
-	# Input: a 1024 list of pixels where each pixel is [R G B]
-	# Output: a 1024 list of grayscale values
+    # Converts a colour image to grayscale
+    # Image needs to be in the format as returned by format_display
+    # Input: a 1024 list of pixels where each pixel is [R G B]
+    # Output: a 1024 list of grayscale values
 
-	# Standard NTSC conversion
-	img = [ 0.2989*i[0] + 0.5870*i[1] + 0.1140*i[2] for i in img]
-	img = np.asarray(img)
-	return img
+    # Standard NTSC conversion
+    img = [ 0.2989*i[0] + 0.5870*i[1] + 0.1140*i[2] for i in img]
+    img = np.asarray(img)
+    return img
 
 def generate_eigenimages(imgs, n_eig, plot):
-	# c: class of images from which to extract the eigenimages
-	# imgs: the entire data set of images
-	# n_eig: number of eigenimages stored
-	# plot (boolean): plots the first couple of eigenimages
+    # c: class of images from which to extract the eigenimages
+    # imgs: the entire data set of images
+    # n_eig: number of eigenimages stored
+    # plot (boolean): plots the first couple of eigenimages
 
-	# Generate a list of lists of images (by category and index within category)
-	images = [[] for x in range(10)]
+    # Generate a list of lists of images (by category and index within category)
+    images = [[] for x in range(10)]
 
-	train = len(imgs['data'])
-	for i in range(train):
-		label = test_images['labels'][i]
-		picture = image_data(test_images['data'][i])
-		images[label].append(picture)
-	
-	
-	# extract eigen images for each category
-	eigenimages = np.asarray([w[0:n_eig, :] for _, s, w in map(np.linalg.svd, images)])
+    train = len(imgs['data'])
+    for i in range(train):
+        label = imgs['labels'][i]
+        picture = image_data(imgs['data'][i])
+        images[label].append(picture)
+    
+    
+    # extract eigen images for each category
+    print('Starting svd')
+    eigenimages = np.asarray([w[0:n_eig, :] for _, s, w in map(np.linalg.svd, images)])
+    print('Finished svd')
 
-	if plot:
-		for c in range(10):
-			fig = plt.figure()
-			for i in range(25):
-				ax = fig.add_subplot(5,5,i+1)
-				plt.imshow(eigenimages[c][i].reshape(32,32), cmap='Greys_r')
-				plt.title('Eigenimages of class' + str(c))
 
-	return eigenimages
+    if plot:
+        for c in range(10):
+            fig = plt.figure()
+            for i in range(25):
+                ax = fig.add_subplot(5,5,i+1)
+                plt.imshow(eigenimages[c][i].reshape(32,32), cmap='Greys_r')
+                plt.title('Eigenimages of class' + str(c))
+
+    return eigenimages
 
 def eigen_reconstruct(img, n_rec, components):
-	# img: the image to be reconstructed
-	# n_rec: number of eigenimages used in the reconstruction
-	# components: the eigenimages that can be used in the reconstruction
-	# display (boolean): prints out the contribution of each eigenimage
+    # img: the image to be reconstructed
+    # n_rec: number of eigenimages used in the reconstruction
+    # components: the eigenimages that can be used in the reconstruction
+    # display (boolean): prints out the contribution of each eigenimage
 
-	img_components = img.dot(components[:n_rec, :].T)
-	rec_image = img_components.dot(components[:n_rec, :])
-	return rec_image
+    img_components = img.dot(components[:n_rec, :].T)
+    rec_image = img_components.dot(components[:n_rec, :])
+    return rec_image
 
 def comparison(img1, img2):
-	return np.sqrt(sum(np.square(img1-img2)))
+    return np.sqrt(sum(np.square(img1-img2)))
 
     
 
 def plot_reconstructed(pic, title):
-	fig = plt.figure()
-	plt.title(title)
-	plt.imshow(pic.reshape(32,32), cmap='Greys_r')
+    fig = plt.figure()
+    plt.title(title)
+    plt.imshow(pic.reshape(32,32), cmap='Greys_r')
 
 #################
 # 	Script 		#
@@ -102,39 +107,39 @@ def plot_reconstructed(pic, title):
 classes = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
 test_images = unpickle('./cifar-10-batches-py/test_batch')
-training = [unpickle('./cifar-10-batches-py/data_batch_{}'.format(i+1) for i in range(5)]
+training = [unpickle('./cifar-10-batches-py/data_batch_{}'.format(i+1)) for i in range(5)]
 
 training_images = {'data': [img for train in training for img in train['data']], 
-				   'labels': [label for train in training for label in train['labels']}
+                   'labels': [label for train in training for label in train['labels']]}
 
-eigenimages = [generate_eigenimages(training_images, 100, False) for i in range(10)]
+eigenimages = generate_eigenimages(training_images, 100, False)
 '''
 fig = plt.figure()
 for i in range(25):
-	ax = fig.add_subplot(5,5, i+1)
-	plt.imshow(eigenimages[i][:25].reshape(32,32), cmap='Greys_r')
+    ax = fig.add_subplot(5,5, i+1)
+    plt.imshow(eigenimages[i][:25].reshape(32,32), cmap='Greys_r')
 '''
 correct = 0
 
 tests = len(test_images['data'])
 
 for i in range(tests):
-	label = test_images['labels'][i]
-	picture = image_data(test_images['data'][i])
+    label = test_images['labels'][i]
+    picture = image_data(test_images['data'][i])
 
-	store_images = [eigen_reconstruct(picture, 50, eigs) for eigs in eigenimages]
+    store_images = [eigen_reconstruct(picture, 50, eigs) for eigs in eigenimages]
 
-	# ---- Plot the images -----
-	# fig = plt.figure()
-	# for i in range(len(store_images)):
-	# 	ax = fig.add_subplot(2,5, i+1)
-	# 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
+    # ---- Plot the images -----
+    # fig = plt.figure()
+    # for i in range(len(store_images)):
+    # 	ax = fig.add_subplot(2,5, i+1)
+    # 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
 
 
-	err = [comparison(img, picture) for img in store_images]
-	print(classes[label], ', '.join('{}: {:.2f}'.format(classes[t[0]], t[1]) for t in sorted(enumerate(err), key=lambda t: t[1])[:3]))
-	if np.argmin(err) == label:
-		correct += 1
+    err = [comparison(img, picture) for img in store_images]
+    #print(classes[label], ', '.join('{}: {:.2f}'.format(classes[t[0]], t[1]) for t in sorted(enumerate(err), key=lambda t: t[1])[:3]))
+    if np.argmin(err) == label:
+        correct += 1
 
 print(correct, tests)
 print('Accuracy: {:.2%}'.format(correct/float(tests)))
