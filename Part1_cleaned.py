@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
+import code
+
 # Classes
 # +------------+---+	 +------------+---+
 # | Airplane   | 0 |	 | Dog        | 5 |
@@ -92,15 +94,20 @@ def eigen_reconstruct(img, n_rec, components):
     # components: the eigenimages that can be used in the reconstruction
     # display (boolean): prints out the contribution of each eigenimage
 
-    weighting = img.dot(components[:n_rec, :].T)
-    # rec_image = img_components.dot(components[:n_rec, :])
-    # return rec_image
-    return weighting
+    img_components = img.dot(components[:n_rec, :].T)
+    rec_image = img_components.dot(components[:n_rec, :])
+    return rec_image
 
 def comparison(img1, img2):
     return np.sqrt(sum(np.square(img1-img2)))
 
-    
+
+def translate_x(img, dist):
+    img = img.reshape((3,32,32))
+
+
+#def transform_image(image):
+
 
 def plot_reconstructed(pic, title):
     fig = plt.figure()
@@ -113,14 +120,32 @@ def plot_reconstructed(pic, title):
 
 classes = ['Airplane', 'Automobile', 'Bird', 'Cat', 'Deer', 'Dog', 'Frog', 'Horse', 'Ship', 'Truck']
 
+transforms = [[
+    ('Identity', lambda img: img), 
+    ('Reflect horizontally', lambda img: img.copy().reshape((3,32,32))[:,:,::-1].reshape((3*32*32))), 
+    ('Reflect vertically', lambda img: img.copy().reshape((3,32,32))[:,::-1,:].reshape((3*32*32)))
+    ], [
+    ('Identity', lambda img: img), 
+    ('Translate 2 pixels +x'), 
+    ('Translate 4 pixels +x'), 
+    ('Translate 2 pixels -x'), 
+    ('Translate 4 pixels -x'), 
+    ], [
+    ('Identity', lambda img: img), 
+    ('Translate 2 pixels +y'), 
+    ('Translate 4 pixels +y'), 
+    ('Translate 2 pixels -y'), 
+    ('Translate 4 pixels -y')
+]]
+
 n_eig = 100
 
 test_images = unpickle('./cifar-10-batches-py/test_batch')
 training = [unpickle('./cifar-10-batches-py/data_batch_{}'.format(i+1)) for i in range(5)]
-
+print('Loading training data')
 training_images = {'data': [img for train in training for img in train['data']], 
                    'labels': [label for train in training for label in train['labels']]}
-
+print('Finished loading training data')
 eigenimages, validation = generate_eigenimages(training_images, n_eig, False)
 '''
 fig = plt.figure()
@@ -130,19 +155,25 @@ for i in range(25):
 '''
 correct = 0
 
-print('\n'.join('{}'.format(np.sqrt(sum(x*x for x in v))) for v in validation))
-
-tests = 5 #len(test_images['data'])
+tests = len(test_images['data'])
 
 for i in range(tests):
     label = test_images['labels'][i]
     picture = image_data(test_images['data'][i])
 
-    weightings = [eigen_reconstruct(picture, n_eig, eigs) for eigs in eigenimages]
-    print('\n'.join('{}'.format(np.sqrt(sum(x*x for x in v))) for v in weightings))
+    #transformed_pictures = transform_image(picture)
 
-    # Reconstruct images
-    reconstructed = [w.dot(e) for w, e in zip(weightings, eigenimages)]
+    
+    reconstructed = [eigen_reconstruct(picture, n_eig, eigs) for picture in (t[1](picture) for t in transforms[0]) for eigs in eigenimages]
+
+    # # Plot reconstructed
+    fig = plt.figure()
+    for i,p in enumerate(reconstructed + [picture]):
+        fig.add_subplot(7,5, i+1)
+        plt.imshow(format_display(p.copy()).reshape((32,32,3)))
+    plt.show()
+
+    # print(len(reconstructed))
 
     # ---- Plot the images -----
     # fig = plt.figure()
@@ -150,9 +181,9 @@ for i in range(tests):
     # 	ax = fig.add_subplot(2,5, i+1)
     # 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
 
-    err = [comparison(v, img) for v, img in zip(validation, weightings)]
-    print(classes[label], ', '.join('{}: {:.2f}'.format(classes[t[0]], t[1]) for t in sorted(enumerate(err), key=lambda t: t[1])))
-    if np.argmin(err) == label:
+    err = [comparison(picture, img) for img in reconstructed]
+    print(classes[label], ', '.join('{}: {:.2f} ({})'.format(classes[t[0]%10], t[1], transforms[0][t[0]/10][0]) for t in sorted(enumerate(err), key=lambda t: t[1])))
+    if np.argmin(err) % 10 == label:
         correct += 1
 
 print(correct, tests)
