@@ -164,7 +164,7 @@ for i in range(tests):
     #transformed_pictures = transform_image(picture)
 
     
-    reconstructed = [eigen_reconstruct(picture, n_eig, eigs) for picture in (t[1](picture) for t in transforms[0]) for eigs in eigenimages]
+    reconstructed = [eigen_reconstruct(pic, n_eig, eigs) for pic in (t[1](picture) for t in transforms[0]) for eigs in eigenimages]
 
     # # Plot reconstructed
     fig = plt.figure()
