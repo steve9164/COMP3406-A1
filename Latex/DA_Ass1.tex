@@ -1,0 +1,35 @@
+\documentclass[11pt, oneside]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
+\usepackage{geometry}                		% See geometry.pdf to learn the layout options. There are lots.
+\geometry{letterpaper}                   		% ... or a4paper or a5paper or ... 
+%\geometry{landscape}                		% Activate for rotated page geometry
+%\usepackage[parfill]{parskip}    		% Activate to begin paragraphs with an empty line rather than an indent
+\usepackage{graphicx}				% Use pdf, png, jpg, or eps§ with pdflatex; use eps in DVI mode
+								% TeX will automatically convert eps --> pdf in pdflatex		
+\usepackage{amssymb}
+
+%SetFonts
+
+%SetFonts
+
+
+\title{INFO3406 Assignment 1\\ Report}
+\author{Stephen Davies, 440187453\\ Alison Wong, 440339111}
+\date{}							% Activate to display a given date or no date
+
+\begin{document}
+\maketitle
+
+\section*{Introduction}
+
+\indent This is a study of image classification. In particular, we have looked at classifying images from two data sets of 60 000 32x32 colour images. The first data set was classified under 10 classes, and the second data set was classified under 100 classes, and then further grouped under 20 superclasses. The aim of the study was to classify these images into their classes as accurately as possible. To do this, single valued decomposition was conducted on each possible class, then each image was reconstructed using the attained 'eigenimages' for each class. The class where the eigenimages produced the best reconstruction was deemed the most likely class of the image. Analysis of the chosen algorithm in terms of accuracy and efficiency was done to gain a better understanding of the difficulties of image classification. 
+\\ \indent The problem of image classification is becoming increasingly important, with large quantities of data being collected all the time, and a desire to be able to process the incoming data. There are many applications of image classification that have been introduced. One recent example is \textit{Deepface}, which is a face recognition system developed by \textit{Facebook}, allowing people to recognised in photos. Another example is \textit{Google's} image recognition software which allows users to submit searches which are images. Example applications of image recognition are: text recognition, scene detection, biometrics. There are still many more applications, which haven't yet been though of but will depend on future methods of image recognition, data samples and industry or research needs. Hence, the problem of image classification, is hugely essential to an increasingly data driven society.
+
+\section*{Reflection}
+
+\indent This has been a very exciting assignment, and the task quite different from any other assessments encountered at university. The open-ended nature of the task has allowed us freedom to implement a classification algorithm to our liking and has given us the opportunity to get creative. Through this assessment we have been able to put into practice the theory we have learnt in class, to consolidate our understanding.
+\\ \indent Through this assignment we have also had the pleasure of working in pairs where we were able to bounce ideas off each other, evaluate each others work and debug each others code, which has resulted in an efficiency that would not have been achievable if we had worked individually. 
+\\ \indent We have also learnt a huge lesson in time management. As usual, assessments always take longer than envisaged. This one was particularly time consuming on the account that it could take a substantial amount of time to run code. To compensate, we would often run code that would take a while on one computer, while work on other tasks on a second computer. We also divided the work load so that the both of us could complete tasks simultaneously.
+
+\section*{References}
+
+\end{document}  
