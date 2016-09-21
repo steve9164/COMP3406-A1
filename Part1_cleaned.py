@@ -167,11 +167,11 @@ for i in range(tests):
     reconstructed = [eigen_reconstruct(pic, n_eig, eigs) for pic in (t[1](picture) for t in transforms[0]) for eigs in eigenimages]
 
     # # Plot reconstructed
-    fig = plt.figure()
-    for i,p in enumerate(reconstructed + [picture]):
-        fig.add_subplot(7,5, i+1)
-        plt.imshow(format_display(p.copy()).reshape((32,32,3)))
-    plt.show()
+    # fig = plt.figure()
+    # for i,p in enumerate(reconstructed + [picture]):
+    #     fig.add_subplot(7,5, i+1)
+    #     plt.imshow(format_display(p.copy()).reshape((32,32,3)))
+    # plt.show()
 
     # print(len(reconstructed))
 
