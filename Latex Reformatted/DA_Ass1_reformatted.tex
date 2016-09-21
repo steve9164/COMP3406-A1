@@ -1,0 +1,111 @@
+% ****** Start of file apssamp.tex ******
+%
+%   This file is part of the APS files in the REVTeX 4.1 distribution.
+%   Version 4.1r of REVTeX, August 2010
+%
+%   Copyright (c) 2009, 2010 The American Physical Society.
+%
+%   See the REVTeX 4 README file for restrictions and more information.
+%
+% TeX'ing this file requires that you have AMS-LaTeX 2.0 installed
+% as well as the rest of the prerequisites for REVTeX 4.1
+%
+% See the REVTeX 4 README file
+% It also requires running BibTeX. The commands are as follows:
+%
+%  1)  latex apssamp.tex
+%  2)  bibtex apssamp
+%  3)  latex apssamp.tex
+%  4)  latex apssamp.tex
+%
+\documentclass[%
+ reprint,
+%superscriptaddress,
+%groupedaddress,
+%unsortedaddress,
+%runinaddress,
+%frontmatterverbose, 
+%preprint,
+%showpacs,preprintnumbers,
+%nofootinbib,
+%nobibnotes,
+%bibnotes,
+ amsmath,amssymb,
+ aps,
+%pra,
+%prb,
+%rmp,
+%prstab,
+%prstper,
+%floatfix,
+]{revtex4-1}
+\usepackage{color}
+\usepackage{graphicx}% Include figure files
+\usepackage{dcolumn}% Align table columns on decimal point
+\usepackage{bm}% bold math
+%\usepackage{hyperref}% add hypertext capabilities
+%\usepackage[mathlines]{lineno}% Enable numbering of text and display math
+%\linenumbers\relax % Commence numbering lines
+
+%\usepackage[showframe,%Uncomment any one of the following lines to test 
+%%scale=0.7, marginratio={1:1, 2:3}, ignoreall,% default settings
+%%text={7in,10in},centering,
+%%margin=1.5in,
+%%total={6.5in,8.75in}, top=1.2in, left=0.9in, includefoot,
+%%height=10in,a5paper,hmargin={3cm,0.8in},
+%]{geometry}
+
+\begin{document}
+
+\preprint{APS/123-QED}
+
+\title{INFO3406 Assignment 1}% Force line breaks with \\
+
+\author{Stephen Davies, Alison Wong}
+\affiliation{%
+sdav7489@uni.sydney.edu.au, 440187453, awon8465@uni.sydney.edu, 440339111}%
+
+\date{\today}% It is always \today, today,
+             %  but any date may be explicitly specified
+
+\begin{abstract}
+		
+\end{abstract}
+
+\pacs{Valid PACS appear here}% PACS, the Physics and Astronomy
+                             % Classification Scheme.
+%\keywords{Suggested keywords}%Use showkeys class option if keyword
+                              %display desired
+\maketitle
+
+
+\section{\label{sec:level1}Introduction}
+\indent This is a study of image classification. In particular, we have looked at classifying images from two data sets of 60 000 32x32 colour images. The first data set was classified under 10 classes, and the second data set was classified under 100 classes, and then further grouped under 20 superclasses. The aim of the study was to classify these images into their classes as accurately as possible. To do this, single valued decomposition was conducted on each possible class, then each image was reconstructed using the attained 'eigenimages' for each class. The class where the eigenimages produced the best reconstruction was deemed the most likely class of the image. Analysis of the chosen algorithm in terms of accuracy and efficiency was done to gain a better understanding of the difficulties of image classification. 
+\\ \indent The problem of image classification is becoming increasingly important, with large quantities of data being collected all the time, and a desire to be able to process the incoming data. There are many applications of image classification that have been introduced. One recent example is \textit{Deepface}, which is a face recognition system developed by \textit{Facebook}, allowing people to recognised in photos. Another example is \textit{Google's} image recognition software which allows users to submit searches which are images. Example applications of image recognition are: text recognition, scene detection, biometrics. There are still many more applications, which haven't yet been though of but will depend on future methods of image recognition, data samples and industry or research needs. Hence, the problem of image classification, is hugely essential to an increasingly data driven society.
+
+	
+\section{\label{sec:level1}Methods} 
+
+\section{\label{sec:level1}Analysis of Results and Discussion}	
+	%\begin{figure}
+	%	\includegraphics[width = 0.3\textwidth]{ImageA}
+	%	\caption{\label{fig:ImageA} Image A: black and white image of one dimensional diffraction grating which has periodic striations. }
+	%	\includegraphics[width = 0.3\textwidth]{ImageB}
+	%	\caption{\label{fig:ImageB} Image B: black and white image of dusty mesh which is periodic in two directions. }
+	%\end{figure}
+	
+\section{\label{sec:level1}Conclusion}
+
+\section{\label{sec:level1}Reflection}
+\indent This has been a very exciting assignment, and the task quite different from any other assessments encountered at university. The open-ended nature of the task has allowed us freedom to implement a classification algorithm to our liking and has given us the opportunity to get creative. Through this assessment we have been able to put into practice the theory we have learnt in class, to consolidate our understanding.
+\\ \indent Through this assignment we have also had the pleasure of working in pairs where we were able to bounce ideas off each other, evaluate each others work and debug each others code, which has resulted in an efficiency that would not have been achievable if we had worked individually. 
+\\ \indent We have also learnt a huge lesson in time management. As usual, assessments always take longer than envisaged. This one was particularly time consuming on the account that it could take a substantial amount of time to run code. To compensate, we would often run code that would take a while on one computer, while work on other tasks on a second computer. We also divided the work load so that the both of us could complete tasks simultaneously.
+\section{\label{sec:level1}References}	
+
+[1] Ranzato, M. Taigman, Y. Wolf, L. Yang, M. (2014) \textit{DeepFace: Closing the Gap to Human-Level Performance in Face Verification} [Online] Available: https:\/\/www.cs.toronto.edu\/\~ranzato\/publications\/taigman\_cvpr14.pdf
+[2] Krizhevsky, A. (2009) \textit{Learning Multiple Layers of Features from Tiny Images} [Online] Available: http://www.cs.toronto.edu/\~kriz/learning-features-2009-TR.pdf
+% make numbers on graphs bigger
+
+\end{document}
+%
+% ****** End of file apssamp.tex ******
