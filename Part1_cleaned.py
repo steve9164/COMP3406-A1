@@ -163,67 +163,22 @@ for i in range(tests):
 
     #transformed_pictures = transform_image(picture)
 
-    
-    reconstructed = [eigen_reconstruct(pic, n_eig, eigs) for pic in (t[1](picture) for t in transforms[0]) for eigs in eigenimages]
+    reconstructed = [(pic, eigen_reconstruct(pic, n_eig, eigs)) for pic in (t[1](picture) for t in transforms[0]) for eigs in eigenimages]
 
     # # Plot reconstructed
     # fig = plt.figure()
-    # for i,p in enumerate(reconstructed + [picture]):
+    # for i,p in enumerate(reconstructed + [(picture, picture)]):
     #     fig.add_subplot(7,5, i+1)
-    #     plt.imshow(format_display(p.copy()).reshape((32,32,3)))
+    #     plt.imshow(format_display(p[1].copy()).reshape((32,32,3)))
     # plt.show()
 
-    # print(len(reconstructed))
-
-    # ---- Plot the images -----
-    # fig = plt.figure()
-    # for i in range(len(store_images)):
-    # 	ax = fig.add_subplot(2,5, i+1)
-    # 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
-
-    err = [comparison(picture, img) for img in reconstructed]
+    err = [comparison(orig, img) for orig, img in reconstructed]
     print(classes[label], ', '.join('{}: {:.2f} ({})'.format(classes[t[0]%10], t[1], transforms[0][t[0]/10][0]) for t in sorted(enumerate(err), key=lambda t: t[1])))
     if np.argmin(err) % 10 == label:
         correct += 1
 
 print(correct, tests)
 print('Accuracy: {:.2%}'.format(correct/float(tests)))
-
-# plt.figure()
-# for i in range(10):
-#     ax = fig.add_subplot(2,5,i+1)
-#     plt.imshow(format_display(store_images[i]))
-
-# # ----- plot all the images ----
-# # fig = plt.figure()
-# # for i in range(tests):
-# # 	ax = fig.add_subplot(4,5, i+1)
-# # 	plt.imshow(image_data(test_images['data'][i]).reshape(32,32), cmap='Greys_r')
-
-# # plt.show()
-
-
-
-# #############################
-# # Plot reconstructed images #
-# #############################
-
-# # fig = plt.figure()
-# # for i in range(10):
-# # 	ax = fig.add_subplot(2,5, i+1)
-# # 	plt.imshow(store_images[i].reshape(32,32), cmap='Greys_r')
-# # 	print(comparison(store_images[i], picture))
-
-# # #############################
-# # # Plot original image 	    #
-# # #############################
-
-# # fig = plt.figure()
-
-# # plt.imshow(picture.reshape(32,32), cmap = 'Greys_r')
-
-
-# plt.show()
 
 
 
